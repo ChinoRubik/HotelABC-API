@@ -1,0 +1,26 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HotelABC_API.Models.DTOs
+{
+    public class CreateRoomDto
+    {
+        [Required]
+        [MinLength(5)]
+        public string Name { get; set; }
+
+        [Required]
+        [MinLength(5)]
+        public string Description { get; set; }
+
+        [Required]
+        public List<IFormFile> File { get; set; }
+
+        [Required]
+        [MinLength(5)]
+        public string Characteristics { get; set; }
+
+        [Required]
+        [Range(100, 5000)]
+        public double Price { get; set; }
+    }
+}
