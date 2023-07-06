@@ -50,6 +50,15 @@ namespace HotelABC_API.Repositories
             var rooms = await hotelDbContext.Rooms
                 .Include(room => room.Images)
                 .ToListAsync();
+
+            foreach (var room in rooms)
+            {
+                if (room.Images.Count > 0)
+                {
+                    Console.Write("Im here mothher fuckler");
+                    room.Images = new List<Image> { room.Images[0] };
+                }
+            }
             var roomsDto = mapper.Map<List<RoomDto>>(rooms);
             //foreach (var room in roomsDto)
             //{

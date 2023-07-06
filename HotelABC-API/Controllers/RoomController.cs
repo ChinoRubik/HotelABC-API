@@ -39,7 +39,7 @@ namespace HotelABC_API.Controllers
             {
                 return NotFound();
             }
-            return Ok(mapper.Map<RoomDto>(room));
+            return Ok(mapper.Map<RoomDetailDto>(room));
         }
 
         [HttpPost]
@@ -53,7 +53,7 @@ namespace HotelABC_API.Controllers
                 var roomDomain = mapper.Map<Room>(createRoomDto);
                 await roomRepository.CreateRoom(roomDomain);
 
-                var roomDto = mapper.Map<RoomDto>(roomDomain);
+                var roomDto = mapper.Map<RoomDetailDto>(roomDomain);
                 foreach (var file in createRoomDto.File)
                 {
                     var imageDomain = new Image
@@ -98,7 +98,7 @@ namespace HotelABC_API.Controllers
                     return NotFound();
                 }
 
-                var roomDto = mapper.Map<RoomDto>(roomDomain);
+                var roomDto = mapper.Map<RoomDetailDto>(roomDomain);
 
                 foreach (var file in updateRoomDto.File)
                 {
@@ -158,7 +158,7 @@ namespace HotelABC_API.Controllers
             {
                 return NotFound();
             }
-            return Ok(mapper.Map<RoomDto>(roomDomain));
+            return Ok(mapper.Map<RoomDetailDto>(roomDomain));
         }
 
 
