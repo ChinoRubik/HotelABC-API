@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Azure;
 using HotelABC_API.Models.Domain;
 using HotelABC_API.Models.DTOs;
 using HotelABC_API.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace HotelABC_API.Controllers
 {
@@ -80,14 +82,65 @@ namespace HotelABC_API.Controllers
 
         [HttpPut]
         [Route("{Id:Guid}")]
-        public async Task<IActionResult> UpdateRoom([FromRoute] Guid Id, [FromBody] CreateRoomDto updateRoomDto)
+        public async Task<IActionResult> UpdateRoom([FromRoute] Guid Id, [FromForm] CreateRoomDto updateRoomDto)
         {
-            var roomDomain = await roomRepository.UpdateRoom(Id, mapper.Map<Room>(updateRoomDto));
+            ValidateFileUpload(updateRoomDto);
+
+            if (ModelState.IsValid)
+            {
+                var roomDomain = await roomRepository.UpdateRoom(Id, mapper.Map<Room>(updateRoomDto));
+                if (roomDomain == null)
+                {
+                    return NotFound();
+                }
+
+                var roomDto = mapper.Map<RoomDto>(roomDomain);
+
+                foreach (var file in updateRoomDto.File)
+                {
+                    var imageDomain = new Image
+                    {
+                        File = file,
+                        RelativeRelationId = roomDomain.Id,
+                        ImageTypeId = Guid.Parse("3897b275-7a3f-4a84-a620-105b9b0eb89a"),
+                    };
+                    var imageUploadedDomain = await roomRepository.UploadImage(imageDomain);
+                    if (roomDto.Images == null)
+                    {
+                        roomDto.Images = new List<ImageDto> { mapper.Map<ImageDto>(imageUploadedDomain) };
+
+                    }
+                    else
+                    {
+                        roomDto.Images.Add(mapper.Map<ImageDto>(imageUploadedDomain));
+                    }
+
+                }
+                return Ok(roomDto);
+
+
+            }
+            return BadRequest();
+        }
+
+        [HttpPatch]
+        [Route("{Id:Guid}")]
+        public async Task<IActionResult> PatchRoom([FromRoute] Guid Id, [FromBody] JsonPatchDocument<CreateRoomDto> patchDocument)
+        {
+            var roomDomain = await roomRepository.GetById(Id);
             if (roomDomain == null)
             {
                 return NotFound();
             }
-            return Ok(mapper.Map<RoomDto>(roomDomain));
+            var roomDto = mapper.Map<CreateRoomDto>(roomDomain);
+            patchDocument.ApplyTo(roomDto, ModelState);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            await roomRepository.PatchRoom(roomDomain, roomDto);
+            return Ok(roomDto);
         }
 
         [HttpDelete]

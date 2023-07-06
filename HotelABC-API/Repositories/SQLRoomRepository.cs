@@ -3,7 +3,6 @@ using HotelABC_API.Data;
 using HotelABC_API.Models.Domain;
 using HotelABC_API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace HotelABC_API.Repositories
 {
@@ -76,7 +75,7 @@ namespace HotelABC_API.Repositories
 
         public async Task<Room?> UpdateRoom(Guid Id, Room room)
         {
-            var roomDomain = await hotelDbContext.Rooms.FirstOrDefaultAsync(item => item.Id == Id);
+            var roomDomain = await hotelDbContext.Rooms.Include(room => room.Images).FirstOrDefaultAsync(item => item.Id == Id);
             if (roomDomain == null)
             {
                 return null;
@@ -85,6 +84,13 @@ namespace HotelABC_API.Repositories
             roomDomain.Description = room.Description;
             roomDomain.Characteristics = room.Characteristics;
             roomDomain.Price = room.Price;
+            foreach (var image in roomDomain.Images)
+            {
+                DeleteImageFromFolder(image.FilePath);
+            }
+
+            roomDomain.Images = new List<Image> { };
+
             await hotelDbContext.SaveChangesAsync();
 
             return roomDomain;
@@ -130,5 +136,17 @@ namespace HotelABC_API.Repositories
             string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             return timestamp;
         }
+
+        public async Task<Room> PatchRoom(Room room, CreateRoomDto createRoomDto)
+        {
+            room.Name = createRoomDto.Name;
+            room.Description = createRoomDto.Description;
+            room.Characteristics = createRoomDto.Characteristics;
+            room.Price = createRoomDto.Price;
+
+            await hotelDbContext.SaveChangesAsync();
+            return room;
+        }
+
     }
 }

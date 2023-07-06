@@ -14,5 +14,7 @@ namespace HotelABC_API.Repositories
         Task<Room?> DeleteRoom(Guid Id);
 
         Task<Image> UploadImage(Image image);
+        Task<Room> PatchRoom(Room room, CreateRoomDto createRoomDto);
+
     }
 }

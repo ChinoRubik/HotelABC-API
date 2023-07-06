@@ -8,7 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+// By default is builder.Services.AddControllers() but is added AddNewtonsoftJson() In order to update by patch
+builder.Services.AddControllers().AddNewtonsoftJson();
+//===========================================================================================================
 
 //REGISTERING HTTPCONTEXTACCESSOR FOR IMAGES ==========================================
 builder.Services.AddHttpContextAccessor();
