@@ -5,6 +5,7 @@ using HotelABC_API.Models.DTOs;
 using HotelABC_API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HotelABC_API.Controllers
 {
@@ -20,6 +21,7 @@ namespace HotelABC_API.Controllers
             this.roomRepository = roomRepository;
             this.mapper = mapper;
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -41,6 +43,7 @@ namespace HotelABC_API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> CreateRoom([FromForm] CreateRoomDto createRoomDto)
         {
             ValidateFileUpload(createRoomDto);
@@ -82,6 +85,7 @@ namespace HotelABC_API.Controllers
 
         [HttpPut]
         [Route("{Id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> UpdateRoom([FromRoute] Guid Id, [FromForm] CreateRoomDto updateRoomDto)
         {
             ValidateFileUpload(updateRoomDto);
@@ -125,6 +129,7 @@ namespace HotelABC_API.Controllers
 
         [HttpPatch]
         [Route("{Id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> PatchRoom([FromRoute] Guid Id, [FromBody] JsonPatchDocument<CreateRoomDto> patchDocument)
         {
             var roomDomain = await roomRepository.GetById(Id);
@@ -145,6 +150,7 @@ namespace HotelABC_API.Controllers
 
         [HttpDelete]
         [Route("{Id:Guid}")]
+        [Authorize(Roles = "Writer")]
         public async Task<IActionResult> DeleteRoom([FromRoute] Guid Id)
         {
             var roomDomain = await roomRepository.DeleteRoom(Id);

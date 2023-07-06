@@ -1,9 +1,11 @@
 ﻿using HotelABC_API.Models.Domain;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelABC_API.Data
 {
-    public class HotelDbContext : DbContext
+    public class HotelDbContext : IdentityDbContext<IdentityUser>
     {
         public HotelDbContext(DbContextOptions dbContextOptions): base(dbContextOptions)
         {
@@ -17,6 +19,29 @@ namespace HotelABC_API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            var readerRoleId = "f0571c7a-9d14-48c2-ad57-d08430d9e358";
+            var writerRoleId = "8e209f7d-2358-44f1-8623-86684bf3081b";
+
+            var roles = new List<IdentityRole>
+            {
+                new IdentityRole
+                {
+                    Id = readerRoleId,
+                    ConcurrencyStamp = readerRoleId,
+                    Name = "Reader",
+                    NormalizedName = "Reader".ToUpper()
+                },
+                new IdentityRole
+                {
+                    Id = writerRoleId,
+                    ConcurrencyStamp = writerRoleId,
+                    Name = "Writer",
+                    NormalizedName = "Writer".ToUpper()
+                }
+            }; ;
+
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
 
             //Seeding data for ImageTypes
 
