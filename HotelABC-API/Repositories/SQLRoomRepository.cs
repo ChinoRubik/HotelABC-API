@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HotelABC_API.Data;
+using HotelABC_API.Libs;
 using HotelABC_API.Models.Domain;
 using HotelABC_API.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ namespace HotelABC_API.Repositories
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IMapper mapper;
+        private readonly Utils utils;
 
         public SQLRoomRepository(HotelDbContext hotelDbContext, IWebHostEnvironment webHostEnvironment,
             IHttpContextAccessor httpContextAccessor, IMapper mapper)
@@ -20,6 +22,7 @@ namespace HotelABC_API.Repositories
             this.webHostEnvironment = webHostEnvironment;
             this.httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
+            this.utils = new Utils(webHostEnvironment);
         }
 
         public async Task<Room> CreateRoom(Room room)
@@ -38,7 +41,7 @@ namespace HotelABC_API.Repositories
             }
             foreach (var image in roomDomain.Images)
             {
-                DeleteImageFromFolder(image.FilePath);
+                utils.DeleteImageFromFolder(image.FilePath);
             }
             hotelDbContext.Rooms.Remove(roomDomain);
             await hotelDbContext.SaveChangesAsync();
@@ -95,7 +98,7 @@ namespace HotelABC_API.Repositories
             roomDomain.Price = room.Price;
             foreach (var image in roomDomain.Images)
             {
-                DeleteImageFromFolder(image.FilePath);
+                utils.DeleteImageFromFolder(image.FilePath);
             }
 
             roomDomain.Images = new List<Image> { };
@@ -126,19 +129,6 @@ namespace HotelABC_API.Repositories
             await hotelDbContext.SaveChangesAsync();
 
             return image;
-        }
-
-        public void DeleteImageFromFolder(string image_name)
-        {
-            string[] segments = image_name.Split('/');
-
-            string folderPath = Path.Combine(webHostEnvironment.ContentRootPath, "Images");
-            string filePath = Path.Combine(folderPath, segments[segments.Length - 1]);
-
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
         }
         private string GenerateUniqueFileName()
         {

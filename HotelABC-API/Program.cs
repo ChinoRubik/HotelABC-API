@@ -69,6 +69,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("HotelABCConnecti
 //REGISTERING REPOSITORIES ==========================================
 builder.Services.AddScoped<IRoomRepository, SQLRoomRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 // ================================================================
 
 
