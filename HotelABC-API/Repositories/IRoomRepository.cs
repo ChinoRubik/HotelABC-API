@@ -6,14 +6,13 @@ namespace HotelABC_API.Repositories
     public interface IRoomRepository
     {
         Task<List<RoomDto>> GetAllRooms();
-        Task<Room?> GetById(Guid Id);
+        Task<RoomDetailDto?> GetById(Guid Id);
         Task<Room> CreateRoom(Room room);
 
         Task<Room?> UpdateRoom(Guid Id, Room room);
 
         Task<Room?> DeleteRoom(Guid Id);
 
-        Task<Image> UploadImage(Image image);
         Task<Room> PatchRoom(Room room, CreateRoomDto createRoomDto);
 
     }

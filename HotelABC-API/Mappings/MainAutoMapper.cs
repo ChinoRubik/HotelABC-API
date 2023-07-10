@@ -15,6 +15,9 @@ namespace HotelABC_API.Mappings
             CreateMap<RoomDetailDto, Room>().ReverseMap();
             CreateMap<Room, CreateRoomDto>().ReverseMap();
             CreateMap<Image, ImageDto>().ReverseMap();
+
+            CreateMap<Offer, OfferDto>().ReverseMap();
+            CreateMap<OfferCreateUpdateDto, Offer>().ReverseMap();
         }
     }
 }

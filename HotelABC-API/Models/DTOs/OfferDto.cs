@@ -2,14 +2,13 @@
 
 namespace HotelABC_API.Models.DTOs
 {
-    public class RoomDto
+    public class OfferDto
     {
         public Guid Id { get; set; }
-
         public string Name { get; set; }
 
-        public string Characteristics { get; set; }
+        public string Description { get; set; }
 
-        public string? Image { get; set; }
+        public ImageDto? image { get; set; }
     }
 }

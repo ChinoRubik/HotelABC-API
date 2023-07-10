@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
-
+﻿using HotelABC_API.Models.DTOs;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace HotelABC_API.Libs
 {
@@ -21,6 +22,23 @@ namespace HotelABC_API.Libs
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
+            }
+        }
+        public void ValidateFileUpload(List<IFormFile> files, ModelStateDictionary modelState)
+        {
+            var allowedExtension = new string[] { ".jpg", ".jpeg", ".png" };
+
+            foreach (var file in files)
+            {
+                if (!allowedExtension.Contains(Path.GetExtension(file.FileName)))
+                {
+                    modelState.AddModelError("file", "Unsupported file extension");
+                }
+
+                if (file.Length > 10485760)
+                {
+                    modelState.AddModelError("File", "File size more than 10MB, please upload a smaller file");
+                }
             }
         }
     }

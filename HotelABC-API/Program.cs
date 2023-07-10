@@ -7,12 +7,22 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
+//FOR LOGGIN SERILOG LOGGER ===============================================
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .MinimumLevel.Information()
+    .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+//====================================================================================================
 
 // By default is builder.Services.AddControllers() but is added AddNewtonsoftJson() In order to update by patch=============
 builder.Services.AddControllers().AddNewtonsoftJson();
@@ -70,6 +80,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("HotelABCConnecti
 builder.Services.AddScoped<IRoomRepository, SQLRoomRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddScoped<IOffersRepository, SQLOfferRepository>();
 // ================================================================
 
 

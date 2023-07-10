@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HotelABC_API.Migrations
 {
     /// <inheritdoc />
-    public partial class IdentityDbContextaditional : Migration
+    public partial class firstmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -50,6 +50,46 @@ namespace HotelABC_API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ImageTypes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ImageTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Offers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Offers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rooms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Characteristics = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rooms", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -158,6 +198,26 @@ namespace HotelABC_API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Images",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RelativeRelationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ImageTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Images", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Images_Rooms_RelativeRelationId",
+                        column: x => x.RelativeRelationId,
+                        principalTable: "Rooms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
@@ -165,6 +225,17 @@ namespace HotelABC_API.Migrations
                 {
                     { "8e209f7d-2358-44f1-8623-86684bf3081b", "8e209f7d-2358-44f1-8623-86684bf3081b", "Writer", "WRITER" },
                     { "f0571c7a-9d14-48c2-ad57-d08430d9e358", "f0571c7a-9d14-48c2-ad57-d08430d9e358", "Reader", "READER" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ImageTypes",
+                columns: new[] { "Id", "Type" },
+                values: new object[,]
+                {
+                    { new Guid("3897b275-7a3f-4a84-a620-105b9b0eb89a"), "room" },
+                    { new Guid("8929b4bf-5be3-4002-8ad6-b9f46f782f16"), "offers" },
+                    { new Guid("de63304d-8500-4570-8333-abb077e5a23f"), "food" },
+                    { new Guid("e4567686-1b4d-483d-a374-9e99306c8e7b"), "carousel" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -205,6 +276,11 @@ namespace HotelABC_API.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Images_RelativeRelationId",
+                table: "Images",
+                column: "RelativeRelationId");
         }
 
         /// <inheritdoc />
@@ -226,10 +302,22 @@ namespace HotelABC_API.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Images");
+
+            migrationBuilder.DropTable(
+                name: "ImageTypes");
+
+            migrationBuilder.DropTable(
+                name: "Offers");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Rooms");
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelABC_API.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    [Migration("20230706005436_IdentityDbContext aditional")]
-    partial class IdentityDbContextaditional
+    [Migration("20230710025100_Adding offer to image model")]
+    partial class Addingoffertoimagemodel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,10 +38,15 @@ namespace HotelABC_API.Migrations
                     b.Property<Guid>("ImageTypeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("OfferId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("RelativeRelationId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OfferId");
 
                     b.HasIndex("RelativeRelationId");
 
@@ -83,6 +88,25 @@ namespace HotelABC_API.Migrations
                             Id = new Guid("8929b4bf-5be3-4002-8ad6-b9f46f782f16"),
                             Type = "offers"
                         });
+                });
+
+            modelBuilder.Entity("HotelABC_API.Models.Domain.Offer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Offers");
                 });
 
             modelBuilder.Entity("HotelABC_API.Models.Domain.Room", b =>
@@ -327,11 +351,19 @@ namespace HotelABC_API.Migrations
 
             modelBuilder.Entity("HotelABC_API.Models.Domain.Image", b =>
                 {
+                    b.HasOne("HotelABC_API.Models.Domain.Offer", "Offer")
+                        .WithMany()
+                        .HasForeignKey("OfferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("HotelABC_API.Models.Domain.Room", "Room")
                         .WithMany("Images")
                         .HasForeignKey("RelativeRelationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Offer");
 
                     b.Navigation("Room");
                 });

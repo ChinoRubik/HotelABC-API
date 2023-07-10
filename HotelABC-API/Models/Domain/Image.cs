@@ -13,9 +13,5 @@ namespace HotelABC_API.Models.Domain
         public Guid RelativeRelationId { get; set; }
         public Guid ImageTypeId { get; set; }
 
-
-
-        //Possible navegation in future
-        public Room Room { get; set; }
     }
 }

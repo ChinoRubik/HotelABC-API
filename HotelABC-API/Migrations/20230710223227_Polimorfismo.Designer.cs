@@ -4,6 +4,7 @@ using HotelABC_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelABC_API.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    partial class HotelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230710223227_Polimorfismo")]
+    partial class Polimorfismo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,10 +38,20 @@ namespace HotelABC_API.Migrations
                     b.Property<Guid>("ImageTypeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("OfferId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("RelativeRelationId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OfferId");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("Images");
                 });
@@ -337,6 +350,25 @@ namespace HotelABC_API.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("HotelABC_API.Models.Domain.Image", b =>
+                {
+                    b.HasOne("HotelABC_API.Models.Domain.Offer", "Offer")
+                        .WithMany()
+                        .HasForeignKey("OfferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HotelABC_API.Models.Domain.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Offer");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

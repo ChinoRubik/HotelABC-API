@@ -15,6 +15,7 @@ namespace HotelABC_API.Data
         public DbSet<Room> Rooms { get; set; }
         public DbSet<ImageType> ImageTypes { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<Offer> Offers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -73,11 +74,17 @@ namespace HotelABC_API.Data
 
 
             //Making relation between images en rooms
-            modelBuilder.Entity<Image>()
-               .HasOne(image => image.Room)
-               .WithMany(room => room.Images)
-               .HasForeignKey(image => image.RelativeRelationId)
-               .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<Image>()
+            //   .HasOne(image => image.Room)
+            //   .WithMany(room => room.Images)
+            //   .HasForeignKey(image => image.RelativeRelationId)
+            //   .OnDelete(DeleteBehavior.Cascade);
+
+            //modelBuilder.Entity<Image>()
+            //   .HasOne(image => image.Offer)
+            //   .WithOne(offer => offer.Image)
+            //   .HasForeignKey<Offer>(offer => offer.ImageId)
+            //   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

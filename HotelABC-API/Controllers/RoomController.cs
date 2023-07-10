@@ -6,6 +6,8 @@ using HotelABC_API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Authorization;
+using HotelABC_API.Libs;
+using System.Text.Json;
 
 namespace HotelABC_API.Controllers
 {
@@ -15,11 +17,18 @@ namespace HotelABC_API.Controllers
     {
         private readonly IRoomRepository roomRepository;
         private readonly IMapper mapper;
+        private readonly IImageRepository imageRepository;
+        private readonly ILogger<RoomController> logger;
+        private readonly Utils utils;
 
-        public RoomController(IRoomRepository roomRepository, IMapper mapper)
+        public RoomController(IRoomRepository roomRepository, IMapper mapper, 
+            IImageRepository imageRepository, IWebHostEnvironment webHostEnvironment, ILogger<RoomController> logger)
         {
             this.roomRepository = roomRepository;
             this.mapper = mapper;
+            this.imageRepository = imageRepository;
+            this.logger = logger;
+            this.utils = new Utils(webHostEnvironment);
         }
 
 
@@ -39,21 +48,22 @@ namespace HotelABC_API.Controllers
             {
                 return NotFound();
             }
-            return Ok(mapper.Map<RoomDetailDto>(room));
+            return Ok(room);
         }
 
         [HttpPost]
         [Authorize(Roles = "Writer")]
         public async Task<IActionResult> CreateRoom([FromForm] CreateRoomDto createRoomDto)
         {
-            ValidateFileUpload(createRoomDto);
+            utils.ValidateFileUpload(createRoomDto.File, ModelState);
 
             if (ModelState.IsValid)
             {
                 var roomDomain = mapper.Map<Room>(createRoomDto);
-                await roomRepository.CreateRoom(roomDomain);
 
+                var roomCreated = await roomRepository.CreateRoom(roomDomain);
                 var roomDto = mapper.Map<RoomDetailDto>(roomDomain);
+
                 foreach (var file in createRoomDto.File)
                 {
                     var imageDomain = new Image
@@ -64,7 +74,7 @@ namespace HotelABC_API.Controllers
                         //Image Type Id
                         ImageTypeId = Guid.Parse("3897b275-7a3f-4a84-a620-105b9b0eb89a"),
                     };
-                    var imageUploadedDomain = await roomRepository.UploadImage(imageDomain);
+                    var imageUploadedDomain = await imageRepository.UploadImage(imageDomain);
                     if (roomDto.Images == null)
                     {
                         roomDto.Images = new List<ImageDto> {mapper.Map<ImageDto>(imageUploadedDomain) };
@@ -88,7 +98,7 @@ namespace HotelABC_API.Controllers
         [Authorize(Roles = "Writer")]
         public async Task<IActionResult> UpdateRoom([FromRoute] Guid Id, [FromForm] CreateRoomDto updateRoomDto)
         {
-            ValidateFileUpload(updateRoomDto);
+            utils.ValidateFileUpload(updateRoomDto.File, ModelState);
 
             if (ModelState.IsValid)
             {
@@ -108,7 +118,7 @@ namespace HotelABC_API.Controllers
                         RelativeRelationId = roomDomain.Id,
                         ImageTypeId = Guid.Parse("3897b275-7a3f-4a84-a620-105b9b0eb89a"),
                     };
-                    var imageUploadedDomain = await roomRepository.UploadImage(imageDomain);
+                    var imageUploadedDomain = await imageRepository.UploadImage(imageDomain);
                     if (roomDto.Images == null)
                     {
                         roomDto.Images = new List<ImageDto> { mapper.Map<ImageDto>(imageUploadedDomain) };
@@ -144,7 +154,7 @@ namespace HotelABC_API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            await roomRepository.PatchRoom(roomDomain, roomDto);
+            //await roomRepository.PatchRoom(roomDomain, roomDto);
             return Ok(roomDto);
         }
 
@@ -161,23 +171,5 @@ namespace HotelABC_API.Controllers
             return Ok(mapper.Map<RoomDetailDto>(roomDomain));
         }
 
-
-        private void ValidateFileUpload(CreateRoomDto imageUploadRequestDto)
-        {
-            var allowedExtension = new string[] { ".jpg", ".jpeg", ".png" };
-
-            foreach (var file in imageUploadRequestDto.File)
-            {
-                if (!allowedExtension.Contains(Path.GetExtension(file.FileName)))
-                {
-                    ModelState.AddModelError("file", "Unsupported file extension");
-                }
-
-                if (file.Length > 10485760)
-                {
-                    ModelState.AddModelError("File", "File size more than 10MB, please upload a smaller file");
-                }
-            }
-        }
     }
 }

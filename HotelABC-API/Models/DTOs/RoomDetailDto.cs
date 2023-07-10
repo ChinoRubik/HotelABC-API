@@ -10,7 +10,7 @@
 
         public string Characteristics { get; set; }
 
-        public double Price { get; set; }
+        public decimal Price { get; set; }
 
         public List<ImageDto>? Images { get; set; }
     }

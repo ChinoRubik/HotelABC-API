@@ -1,6 +1,7 @@
 ﻿using HotelABC_API.Data;
 using HotelABC_API.Libs;
 using HotelABC_API.Models.Domain;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelABC_API.Repositories
@@ -9,12 +10,15 @@ namespace HotelABC_API.Repositories
     {
         private readonly HotelDbContext hotelDbContext;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly Utils utils;
 
-        public ImageRepository(HotelDbContext hotelDbContext, IWebHostEnvironment webHostEnvironment)
+        public ImageRepository(HotelDbContext hotelDbContext, IWebHostEnvironment webHostEnvironment,
+             IHttpContextAccessor httpContextAccessor)
         {
             this.hotelDbContext = hotelDbContext;
             this.webHostEnvironment = webHostEnvironment;
+            this.httpContextAccessor = httpContextAccessor;
             this.utils = new Utils(webHostEnvironment);
         }
 
@@ -31,6 +35,34 @@ namespace HotelABC_API.Repositories
             await hotelDbContext.SaveChangesAsync();
 
             return imageDomain;
+        }
+
+        public async Task<Image> UploadImage(Image image)
+        {
+            string unique_name = GenerateUniqueFileName();
+            string extensionImage = Path.GetExtension(image.File.FileName);
+            // store files in our app... images folder
+            var localFilePath = Path.Combine(webHostEnvironment.ContentRootPath, "Images", $"{unique_name}{extensionImage}");
+
+            //Upload Image to local Path
+            using var stream = new FileStream(localFilePath, FileMode.Create);
+            await image.File.CopyToAsync(stream);
+
+
+            // https://localhost:1234/images/image.jpg
+            var urlFilePath = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host}{httpContextAccessor.HttpContext.Request.PathBase}/Images/{unique_name}{extensionImage}";
+            image.FilePath = urlFilePath;
+
+            // Add Image to the images table
+            await hotelDbContext.Images.AddAsync(image);
+            await hotelDbContext.SaveChangesAsync();
+
+            return image;
+        }
+        private string GenerateUniqueFileName()
+        {
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            return timestamp;
         }
 
         public async Task<List<Image>> GetAllImages()

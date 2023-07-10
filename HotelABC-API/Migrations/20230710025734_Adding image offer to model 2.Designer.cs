@@ -4,6 +4,7 @@ using HotelABC_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelABC_API.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    partial class HotelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230710025734_Adding image offer to model 2")]
+    partial class Addingimageoffertomodel2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,6 +42,8 @@ namespace HotelABC_API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RelativeRelationId");
 
                     b.ToTable("Images");
                 });
@@ -90,11 +95,17 @@ namespace HotelABC_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("ImageId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ImageId")
+                        .IsUnique();
 
                     b.ToTable("Offers");
                 });
@@ -117,8 +128,8 @@ namespace HotelABC_API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -339,6 +350,28 @@ namespace HotelABC_API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("HotelABC_API.Models.Domain.Image", b =>
+                {
+                    b.HasOne("HotelABC_API.Models.Domain.Room", "Room")
+                        .WithMany("Images")
+                        .HasForeignKey("RelativeRelationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("HotelABC_API.Models.Domain.Offer", b =>
+                {
+                    b.HasOne("HotelABC_API.Models.Domain.Image", "Image")
+                        .WithOne("Offer")
+                        .HasForeignKey("HotelABC_API.Models.Domain.Offer", "ImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Image");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -388,6 +421,17 @@ namespace HotelABC_API.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("HotelABC_API.Models.Domain.Image", b =>
+                {
+                    b.Navigation("Offer")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HotelABC_API.Models.Domain.Room", b =>
+                {
+                    b.Navigation("Images");
                 });
 #pragma warning restore 612, 618
         }

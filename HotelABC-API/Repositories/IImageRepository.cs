@@ -7,5 +7,7 @@ namespace HotelABC_API.Repositories
     {
         Task<List<Image>> GetAllImages();
         Task<Image?> DeleteImage(Guid Id);
+
+        Task<Image> UploadImage(Image image);
     }
 }

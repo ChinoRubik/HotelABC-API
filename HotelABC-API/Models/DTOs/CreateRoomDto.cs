@@ -21,6 +21,6 @@ namespace HotelABC_API.Models.DTOs
 
         [Required]
         [Range(100, 5000)]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
     }
 }
