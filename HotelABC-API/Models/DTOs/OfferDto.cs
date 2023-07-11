@@ -9,6 +9,6 @@ namespace HotelABC_API.Models.DTOs
 
         public string Description { get; set; }
 
-        public ImageDto? image { get; set; }
+        public string? imagePath { get; set; }
     }
 }

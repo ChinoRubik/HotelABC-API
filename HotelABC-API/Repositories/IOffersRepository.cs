@@ -1,4 +1,5 @@
 ﻿using HotelABC_API.Models.Domain;
+using HotelABC_API.Models.DTOs;
 
 namespace HotelABC_API.Repositories
 {
@@ -6,10 +7,10 @@ namespace HotelABC_API.Repositories
     {
         Task<Offer> CreateOffer(Offer offer);
 
-        Task<Offer> UpdateOfferRelation(Guid Id, Offer offer);
+        Task<Offer?> UpdateOffer(Guid Id, Offer offer);
 
-        Task DeleteOffer(Offer offer);
+        Task<Offer?> DeleteOffer(Guid Id);
 
-        Task<List<Offer>> GetOffers();
+        Task<List<OfferDto>> GetOffers();
     }
 }

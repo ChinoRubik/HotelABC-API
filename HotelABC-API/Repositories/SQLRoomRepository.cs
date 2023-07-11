@@ -33,18 +33,20 @@ namespace HotelABC_API.Repositories
 
         public async Task<Room?> DeleteRoom(Guid Id)
         {
-            //var roomDomain = await hotelDbContext.Rooms.FirstOrDefaultAsync(item => item.Id == Id);
-            //if (roomDomain == null)
-            //{
-            //    return null;
-            //}
-            //foreach (var image in roomDomain)
-            //{
-            //    utils.DeleteImageFromFolder(image.FilePath);
-            //}
-            //hotelDbContext.Rooms.Remove(roomDomain);
-            //await hotelDbContext.SaveChangesAsync();
-            return null;
+            var roomDomain = await hotelDbContext.Rooms.FirstOrDefaultAsync(item => item.Id == Id);
+            if (roomDomain == null)
+            {
+                return null;
+            }
+            var roomImagesDomain = await hotelDbContext.Images.Where(item => item.RelativeRelationId == roomDomain.Id).ToListAsync();
+            foreach (var image in roomImagesDomain)
+            {
+                utils.DeleteImageFromFolder(image.FilePath);
+                hotelDbContext.Images.Remove(image);
+            }
+            hotelDbContext.Rooms.Remove(roomDomain);
+            await hotelDbContext.SaveChangesAsync();
+            return roomDomain;
         }
 
         public async Task<List<RoomDto>> GetAllRooms()

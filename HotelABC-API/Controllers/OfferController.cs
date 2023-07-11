@@ -33,47 +33,75 @@ namespace HotelABC_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var offersDomain = await offersRepository.GetOffers();
-            return Ok(mapper.Map<List<OfferDto>>(offersDomain));
+            var offersDto = await offersRepository.GetOffers();
+            return Ok(offersDto);
         }
 
         [HttpPost]
         [Authorize(Roles = "Writer")]
         public async Task<IActionResult> CreateOffer([FromForm] OfferCreateUpdateDto offerCreateUpdate)
         {
-            //IFormFile fileForm = offerCreateUpdate.File;
-            //logger.LogInformation("=====================================================================");
-            //logger.LogInformation(JsonSerializer.Serialize(offerCreateUpdate));
+            utils.ValidateFileUpload(new List<IFormFile> { offerCreateUpdate.File }, ModelState);
+            if (ModelState.IsValid)
+            {
+                var offerDomain = mapper.Map<Offer>(offerCreateUpdate);
+                await offersRepository.CreateOffer(offerDomain);
 
-            //utils.ValidateFileUpload(new List<IFormFile> { fileForm }, ModelState);
-            //if (ModelState.IsValid)
-            //{
-            //    logger.LogInformation("===================================================================== entre aqui");
-            //    var offerDomain = mapper.Map<Offer>(offerCreateUpdate);
-            //    Offer offerSaved = await offersRepository.CreateOffer(offerDomain);
-            //    logger.LogInformation(JsonSerializer.Serialize(offerSaved));
+                var imageDomain = new Image
+                {
+                    File = offerCreateUpdate.File,
+                    RelativeRelationId = offerDomain.Id,
+                    ImageTypeId = Guid.Parse("8929b4bf-5be3-4002-8ad6-b9f46f782f16"),
+                };
+                var imageUploaded = await imageRepository.UploadImage(imageDomain);
 
-            //    var newOfferId = offerDomain.Id;
-            //    var imageDomain = new Image
-            //    {
-            //        File = fileForm,
-            //        // Offer Id
-            //        RelativeRelationId = newOfferId,
-            //        //Image Type Id
-            //        ImageTypeId = Guid.Parse("8929b4bf-5be3-4002-8ad6-b9f46f782f16"),
-            //    };
-            //    var imageUploaded = await imageRepository.UploadImage(imageDomain);
-            //    logger.LogInformation("===================================================================== uploading image");
-            //    logger.LogInformation(JsonSerializer.Serialize(imageUploaded));
+                var offerDto = mapper.Map<OfferDto>(offerDomain);
+                offerDto.imagePath = imageUploaded.FilePath;
 
-            //    await offersRepository.UpdateOfferRelation(offerDomain.Id, offerDomain);
-
-            //    var offerDto = mapper.Map<OfferDto>(offerDomain);
-            //    offerDto.image = mapper.Map<ImageDto>(imageUploaded);
-
-            //    return Ok(offerDto);
-            //}
+                return Ok(offerDto);
+            }
             return BadRequest();
+        }
+
+        [HttpPut]
+        [Authorize(Roles = "Writer")]
+        [Route("{Id:Guid}")]
+        public async Task<IActionResult> UpdateOffer([FromRoute] Guid Id, [FromForm] OfferCreateUpdateDto offerCreateUpdateDto)
+        {
+            utils.ValidateFileUpload(new List<IFormFile> { offerCreateUpdateDto.File }, ModelState);
+            if (ModelState.IsValid)
+            {
+                var offerDomain = await offersRepository.UpdateOffer(Id, mapper.Map<Offer>(offerCreateUpdateDto));
+                if (offerDomain == null)
+                {
+                    return NotFound();
+                }
+
+                Image newImage = new Image
+                {
+                    File = offerCreateUpdateDto.File,
+                    RelativeRelationId = offerDomain.Id,
+                    ImageTypeId = Guid.Parse("8929b4bf-5be3-4002-8ad6-b9f46f782f16"),
+                };
+                var imageUploaaded = await imageRepository.UploadImage(newImage);
+                OfferDto offerDto = mapper.Map<OfferDto>(offerDomain);
+                offerDto.imagePath = imageUploaaded.FilePath;
+                return Ok(offerDto);
+            }
+            return BadRequest();
+        }
+
+        [HttpDelete]
+        [Authorize(Roles = "Writer")]
+        [Route("{Id:Guid}")]
+        public async Task<IActionResult> DeleteOffer([FromRoute] Guid Id)
+        {
+            var offerDomain = await offersRepository.DeleteOffer(Id);
+            if (offerDomain == null)
+            {
+                return NotFound();
+            }
+            return Ok(mapper.Map<OfferDto>(offerDomain));
         }
     }
 }
