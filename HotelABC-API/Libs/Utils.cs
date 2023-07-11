@@ -21,6 +21,7 @@ namespace HotelABC_API.Libs
 
             if (File.Exists(filePath))
             {
+                Console.Write("=======================================================================DELETED");
                 File.Delete(filePath);
             }
         }

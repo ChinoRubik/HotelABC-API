@@ -89,6 +89,9 @@ namespace HotelABC_API.Repositories
         public async Task<Room?> UpdateRoom(Guid Id, Room room)
         {
             var roomDomain = await hotelDbContext.Rooms.FirstOrDefaultAsync(item => item.Id == Id);
+            var imagesDomain = await hotelDbContext.Images
+                .Where(images => images.RelativeRelationId == roomDomain.Id)
+                .ToListAsync();
             if (roomDomain == null)
             {
                 return null;
@@ -97,13 +100,12 @@ namespace HotelABC_API.Repositories
             roomDomain.Description = room.Description;
             roomDomain.Characteristics = room.Characteristics;
             roomDomain.Price = room.Price;
-            //foreach (var image in roomDomain.Images)
-            //{
-            //    utils.DeleteImageFromFolder(image.FilePath);
-            //}
-
-            //roomDomain.Images = new List<Image> { };
-
+            foreach (var image in imagesDomain)
+            {
+                utils.DeleteImageFromFolder(image.FilePath);
+                hotelDbContext.Images.Remove(image);
+            }
+            
             await hotelDbContext.SaveChangesAsync();
 
             return roomDomain;
