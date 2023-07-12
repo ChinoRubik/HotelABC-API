@@ -65,7 +65,7 @@ namespace HotelABC_API.Repositories
             return timestamp;
         }
 
-        public async Task<List<Image>> GetAllImages()
+        public async Task<List<Image>> GetAllImages(string type_image = "room")
         {
             //var typeImageId = await hotelDbContext.ImageTypes.FirstOrDefaultAsync(item => item.Type == "room");
             //var imagesDomain = await hotelDbContext.Images.Where(item => item.ImageTypeId == typeImageId).ToListAsync();
@@ -76,7 +76,7 @@ namespace HotelABC_API.Repositories
                     imageType => imageType.Id,
                     (image, imageType) => new { Image = image, ImageType = imageType }
                 )
-                .Where(joinResult => joinResult.ImageType.Type == "room")
+                .Where(joinResult => joinResult.ImageType.Type == type_image)
                 .Select(joinResult => joinResult.Image)
                 .ToListAsync();
 
