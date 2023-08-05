@@ -20,6 +20,8 @@ namespace HotelABC_API.Mappings
 
             CreateMap<Offer, OfferDto>().ReverseMap();
             CreateMap<OfferCreateUpdateDto, Offer>().ReverseMap();
+
+            CreateMap<ImageType, ImageTypeDto>().ReverseMap();
         }
     }
 }

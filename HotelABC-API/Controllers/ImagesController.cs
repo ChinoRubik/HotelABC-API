@@ -22,7 +22,7 @@ namespace HotelABC_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string type_image = "room")
+        public async Task<IActionResult> GetAll([FromQuery] string? type_image)
         {
             var imagesDomain = await imageRepository.GetAllImages(type_image);
             return Ok(mapper.Map<List<ImageDto>>(imagesDomain));
@@ -58,6 +58,15 @@ namespace HotelABC_API.Controllers
             }
           
             return Ok(mapper.Map<List<ImageDto>>(imagesUploaded));
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Writer")]
+        [Route("Types")]
+        public async Task<IActionResult> GetAllImagestype()
+        {
+            var imagesTypesDomain = await imageRepository.GetAllTypesImages();
+            return Ok(mapper.Map<List<ImageTypeDto>>(imagesTypesDomain));
         }
     }
 }

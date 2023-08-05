@@ -12,8 +12,16 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:4200")
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
 // Add services to the container.
-
 
 //FOR LOGGIN SERILOG LOGGER ===============================================
 var logger = new LoggerConfiguration()
@@ -40,7 +48,7 @@ builder.Services.AddEndpointsApiExplorer();
 // OPTIONS TO ADD TOKEN TO SWAGGER DOCUMENTATION =============================================
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "NZ Walks API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Hotel ABC API", Version = "v1" });
     options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -106,7 +114,6 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 //=============================================================================
 
-
 // REGISTER AUTHENTICATION FOR AUTHORIZATION ROUTES ========================
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -123,6 +130,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 //=================================================================
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -133,6 +141,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors();
 
 // TO Authenticate settings
 app.UseAuthentication(); 

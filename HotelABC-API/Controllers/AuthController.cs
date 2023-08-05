@@ -71,6 +71,7 @@ namespace HotelABC_API.Controllers
                         {
                             Token = jwtToken,
                             NameUser = user.UserName,
+                            Roles = roles.ToList(),
                         };
 
                         return Ok(response);

@@ -16,6 +16,7 @@ namespace HotelABC_API.Data
         public DbSet<ImageType> ImageTypes { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Offer> Offers { get; set; }
+        public DbSet<RoomReservation> RoomReservations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,6 +72,30 @@ namespace HotelABC_API.Data
             };
 
             modelBuilder.Entity<ImageType>().HasData(ImagesTypes);
+
+            //List<RoomReservation> roomsAvaible = new List<RoomReservation>();
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    roomsAvaible.Add(new RoomReservation()
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        roomId = Guid.Parse("5ec91cd3-2842-4a51-c394-08db81affe60"),
+            //    });
+            //    roomsAvaible.Add(new RoomReservation()
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        roomId = Guid.Parse("72727aa7-ddc3-4844-8e79-08db827c2d2c"),
+            //    });
+            //    roomsAvaible.Add(new RoomReservation()
+            //    {
+            //        Id = Guid.NewGuid(),
+            //        roomId = Guid.Parse("eb2fa93b-c9c5-4755-8e7a-08db827c2d2c"),
+            //    });
+            //}
+
+            //modelBuilder.Entity<RoomReservation>().HasData(roomsAvaible);
+
+
 
 
             //Making relation between images en rooms

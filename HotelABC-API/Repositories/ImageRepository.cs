@@ -65,22 +65,44 @@ namespace HotelABC_API.Repositories
             return timestamp;
         }
 
-        public async Task<List<Image>> GetAllImages(string type_image = "room")
+        public async Task<List<Image>> GetAllImages(string? type_image)
         {
             //var typeImageId = await hotelDbContext.ImageTypes.FirstOrDefaultAsync(item => item.Type == "room");
             //var imagesDomain = await hotelDbContext.Images.Where(item => item.ImageTypeId == typeImageId).ToListAsync();
-            var imagesDomain = await hotelDbContext.Images
-                .Join(
-                    hotelDbContext.ImageTypes,
-                    image => image.ImageTypeId,
-                    imageType => imageType.Id,
-                    (image, imageType) => new { Image = image, ImageType = imageType }
-                )
-                .Where(joinResult => joinResult.ImageType.Type == type_image)
-                .Select(joinResult => joinResult.Image)
-                .ToListAsync();
+            if (!string.IsNullOrEmpty(type_image))
+            {
+                var imagesDomain = await hotelDbContext.Images
+                    .Join(
+                        hotelDbContext.ImageTypes,
+                        image => image.ImageTypeId,
+                        imageType => imageType.Id,
+                        (image, imageType) => new { Image = image, ImageType = imageType }
+                    )
+                    .Where(joinResult => joinResult.ImageType.Type == type_image)
+                    .Select(joinResult => joinResult.Image)
+                    .ToListAsync();
+                return imagesDomain;
+            } else
+            {
+                var imagesDomain = await hotelDbContext.Images
+                    .Join(
+                        hotelDbContext.ImageTypes,
+                        image => image.ImageTypeId,
+                        imageType => imageType.Id,
+                        (image, imageType) => new { Image = image, ImageType = imageType }
+                    )
+                    .Select(joinResult => joinResult.Image)
+                    .ToListAsync();
+                
+                return imagesDomain;
+            }
 
-            return imagesDomain;
+        }
+
+        public async Task<List<ImageType>> GetAllTypesImages()
+        {
+            var imagesTypeDomain = await hotelDbContext.ImageTypes.ToListAsync();
+            return imagesTypeDomain;
         }
     }
 }
