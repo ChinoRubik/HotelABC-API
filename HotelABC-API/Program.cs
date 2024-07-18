@@ -9,14 +9,17 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Text;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
+
+DotNetEnv.Env.Load();
 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://localhost:4200")
+        builder.WithOrigins("http://127.0.0.1:5173")
                .AllowAnyHeader()
                .AllowAnyMethod();
     });
@@ -76,11 +79,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 // ===============================================================================
-
-
 // DB CONTEXT  =================================´
+string connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 builder.Services.AddDbContext<HotelDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("HotelABCConnectionString")));
+options.UseSqlServer(connectionString));
 // ====================================================================
 
 

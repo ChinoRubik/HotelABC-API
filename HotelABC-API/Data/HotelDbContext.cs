@@ -41,7 +41,7 @@ namespace HotelABC_API.Data
                     Name = "Writer",
                     NormalizedName = "Writer".ToUpper()
                 }
-            }; ;
+            };
 
             modelBuilder.Entity<IdentityRole>().HasData(roles);
 
