@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
                .AllowAnyMethod();
     });
 });
-// Add services to the container.
+// Add services to the container. fix
 
 //FOR LOGGIN SERILOG LOGGER ===============================================
 var logger = new LoggerConfiguration()
