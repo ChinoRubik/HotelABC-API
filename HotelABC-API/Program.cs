@@ -80,9 +80,23 @@ builder.Services.AddSwaggerGen(options =>
 });
 // ===============================================================================
 // DB CONTEXT  =================================´
+// Configurar la cadena de conexión a la base de datos
 string connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string is not configured.");
+}
+
 builder.Services.AddDbContext<HotelDbContext>(options =>
-options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null);
+    }));
+
 // ====================================================================
 
 
